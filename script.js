@@ -1,11 +1,17 @@
 let fieldWidth = 40;
 let fieldHeight = 40;
 let timerId;
-let timerSpeed;
+let timerSpeed = 500;
 let currentGen = [];
 let currentGenSiblings = [];
 let nextGen = [];
+let generation = 0;
 let object;
+
+let speedOutput;
+let widthOutput;
+let heightOutput;
+let generationOutput;
 
 function divGrid() {
     $(".container").css("grid-template-columns", "repeat(" + fieldWidth + ", 20px)");
@@ -19,7 +25,18 @@ function divGrid() {
 
 function step () {
 
-    console.log(currentGen);
+    if (currentGen.length == 0 && timerId != null) {
+        clearInterval(timerId);
+        timerId = null;
+        object.html("Старт");
+        generation = 0;
+        generationOutput.html("Поколение: " + generation);
+        return ;
+    }
+
+    generation++;
+    generationOutput.html("Поколение: " + generation);
+
     currentGen.forEach(id => {
         if (id % fieldWidth != 0 && id > fieldWidth - 1 && !currentGenSiblings.includes(id - fieldWidth - 1)) {
             currentGenSiblings.push(id - fieldWidth - 1);
@@ -50,13 +67,6 @@ function step () {
         }
     });
 
-    if (currentGenSiblings.length == 0 && timerId != null) {
-        clearInterval(timerId);
-        timerId = null;
-        object.html("Старт");
-        object.attr("data-start", "1");
-        return ;
-    }
     currentGenSiblings.forEach(id => {
         let count = 0;
         if (id % fieldWidth != 0 && id > fieldWidth - 1) {
@@ -102,21 +112,29 @@ function step () {
 }
 
 $(document).ready(function() {
+
+    speedOutput =  $("#speed");
+    widthOutput = $("#width");
+    heightOutput = $("#height");
+    generationOutput = $("#generation");
+
+    speedOutput.html("Скорость: " + timerSpeed / 1000 + "x");
+    widthOutput.attr("value", fieldWidth);
+    heightOutput.attr("value", fieldHeight);
+    generationOutput.html("Поколение: " + 0);
+
     object = $("#change");
 
     divGrid();
 
     object.on("click", function () {
-        if (object.attr("data-start") == 1) {
+        if (object.html() == "Старт") {
             object.html("Пауза");
-            object.attr("data-start", "0");
             if (timerId == null) {
-                timerSpeed = 500;
                 timerId = setInterval(step, timerSpeed);
             }
         } else {
             object.html("Старт");
-            object.attr("data-start", "1");
             if (timerId != null) {
                 clearInterval(timerId);
                 timerId = null;
@@ -126,17 +144,19 @@ $(document).ready(function() {
     });
 
     $("#slow").on("click", function() {
+        timerSpeed *= 2;
+        speedOutput.html("Скорость: " + timerSpeed / 1000 + "x");
         if (timerId != null) {
             clearInterval(timerId);
-            timerSpeed *= 2;
             timerId = setInterval(step, timerSpeed);
         }
     });
 
     $("#fast").on("click", function() {
+        timerSpeed /= 2;
+        speedOutput.html("Скорость: " + timerSpeed / 1000 + "x");
         if (timerId != null) {
             clearInterval(timerId);
-            timerSpeed /= 2;
             timerId = setInterval(step, timerSpeed);
         }
     });
@@ -150,6 +170,8 @@ $(document).ready(function() {
             $(this).removeAttr("class");
         });
         currentGen = [];
+        generation = 0;
+        generationOutput.html("Поколение: " + generation);
     });
 
     $("#width").on("input", function() {
@@ -157,6 +179,7 @@ $(document).ready(function() {
         $(".container").html("");
         divGrid();
         currentGen = [];
+        widthOutput.attr("value", fieldWidth);
     });
 
     $("#height").on("input", function() {
@@ -164,6 +187,7 @@ $(document).ready(function() {
         $(".container").html("");
         divGrid();
         currentGen = [];
+        heightOutput.attr("value", fieldHeight);
     });
 
     $(".container").on("click", "div", function() {
@@ -176,4 +200,6 @@ $(document).ready(function() {
             currentGen.push(id);
         }
     });
+
+    
 });
