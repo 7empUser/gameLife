@@ -1,0 +1,32 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: repeat(50, 20px);
+}
+
+.container div {
+    border: 1px solid black;
+    width: 20px;
+    height: 20px;
+}
+
+.active {
+    background-color: #000;
+}
+
+.buttonDiv {
+    margin: 20px 50px;
+}
+
+button {
+    width: 100px;
+    padding: 5px;
+    margin: 10px;
+    border: 1px solid #000;
+    border-radius: 5px;
+}
